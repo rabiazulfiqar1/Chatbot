@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from agents import Agent, Runner, function_tool, RunHooks, WebSearchTool, SQLiteSession
+from agents import Agent, Runner, function_tool, RunHooks, WebSearchTool, SQLiteSession, RunConfig, SessionSettings
 from pydantic import BaseModel
 from typing import List
 import asyncio
@@ -12,8 +12,13 @@ load_dotenv()
 
 NOTION_TOKEN = os.environ.get("NOTION_API_KEY")
 
+# async def approval_policy(run_context, agent, tool):
+#     return tool.name == "API-post-page"
+
 notion_mcp = MCPServerStdio(
     name="Notion MCP",
+    # require_approval=approval_policy, # require GUI to take approval input
+    # require_approval={"always": {"tool_names": ["API-post-page"]}},
     params={
         "command": r"C:\Users\rzulf\AppData\Roaming\npm\notion-mcp-server.cmd",
         "env": {
@@ -21,7 +26,7 @@ notion_mcp = MCPServerStdio(
             "PATH": os.environ.get("PATH", ""),
         }
     },
-    client_session_timeout_seconds=30
+    client_session_timeout_seconds=30 #Maximum idle time for the client session.
 )
 
 # dependency injection tool to be passed to agents (context)
@@ -102,6 +107,10 @@ task_retrieval_agent = Agent[UserContext](
 # Create session instance
 session = SQLiteSession("conversation_123")
 
+def keep_recent_history(history, new_input):
+    # Keep only the last 10 history items, then append the new turn.
+    return history[-10:] + new_input
+
 ctx = UserContext(
     name="Rabia",
     uid="123",
@@ -133,7 +142,11 @@ async def main():
     #     "What are my pending tasks",
     #     context=ctx,
     #     hooks=LoggingHooks(),
-    #     session=session
+    #     session=session,
+    #     run_config=RunConfig(
+    #       session_settings=SessionSettings(limit=50),
+    #       session_input_callback=keep_recent_history
+    #     ),
     # )
 
     # display_task(result.final_output)
