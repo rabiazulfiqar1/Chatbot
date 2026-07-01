@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Voice Agent</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 40px auto; }
+    button { padding: 10px 20px; margin-right: 10px; font-size: 16px; }
+    #log { background: #111; color: #0f0; padding: 12px; height: 300px;
+           overflow-y: auto; white-space: pre-wrap; font-family: monospace; }
+  </style>
+</head>
+<body>
+  <h1>Voice Agent (WebRTC)</h1>
+  <button id="startBtn">Start Call</button>
+  <button id="stopBtn" disabled>Stop Call</button>
+  <h3>Live log</h3>
+  <div id="log"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
